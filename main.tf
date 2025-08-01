@@ -41,13 +41,13 @@ resource "azurerm_mssql_server" "mssqlserver" {
 }
 
 resource "azurerm_mssql_database" "mssqldatabase" {
-  name           = "${var.mssql_database_name}${random_integer.ri.result}"
-  server_id      = azurerm_mssql_server.mssqlserver.id
-  collation      = "SQL_Latin1_General_CP1_CI_AS"
-  license_type   = "LicenseIncluded"
-  max_size_gb    = 2
-  sku_name       = "S0"
-  enclave_type   = "VBS"
+  name         = "${var.mssql_database_name}${random_integer.ri.result}"
+  server_id    = azurerm_mssql_server.mssqlserver.id
+  collation    = "SQL_Latin1_General_CP1_CI_AS"
+  license_type = "LicenseIncluded"
+  max_size_gb  = 2
+  sku_name     = "S0"
+  enclave_type = "VBS"
 
   lifecycle {
     prevent_destroy = true
