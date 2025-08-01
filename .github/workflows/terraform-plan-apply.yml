@@ -42,7 +42,7 @@ jobs:
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      run: terraform plan -out=tfplan -input=false
+      run: terraform plan -out=tfplan -input=false -var-file="values.tfvars"
 
     # Save plan to artifacts
     - name: Save plan to artifacts
