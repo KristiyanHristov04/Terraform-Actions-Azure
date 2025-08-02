@@ -11,10 +11,36 @@ env:
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
 jobs:
+  storage-setup:
+    name: 'Storage Setup (storage.tf)'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Init without backend
+        run: terraform init -backend=false
+
+      - name: Apply only backend resources
+        run: |
+          terraform apply -auto-approve \
+            -target=azurerm_resource_group.mystoragerg \
+            -target=azurerm_storage_account.mystorageaccount \
+            -target=azurerm_storage_container.mystoragecontainer
+
   terraform-plan:
     name: 'Terraform-Plan'
     runs-on: ubuntu-latest
     environment: production
+    needs: [storage-setup]
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:

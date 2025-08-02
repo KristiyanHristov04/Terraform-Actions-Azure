@@ -7,9 +7,9 @@ terraform {
   }
 
   backend "azurerm" {
-    resource_group_name  = "StorageRG"
-    storage_account_name = "taskboardstorage"
-    container_name       = "taskboardcontainer"
+    resource_group_name  = "MyStorageRG2"
+    storage_account_name = "taskboardsa2025"
+    container_name       = "taskboardsc2025"
     key                  = "terraform.tfstate"
   }
 }
@@ -94,23 +94,4 @@ resource "azurerm_app_service_source_control" "taskboardsc" {
   repo_url               = var.github_repo_name
   branch                 = "master"
   use_manual_integration = true
-}
-
-resource "azurerm_resource_group" "mystoragerg" {
-  name     = "MyStorageRG"
-  location = "North Europe"
-}
-
-resource "azurerm_storage_account" "mystorageaccount" {
-  name                     = "taskboardsa${random_integer.ri.result}"
-  resource_group_name      = azurerm_resource_group.mystoragerg.name
-  location                 = azurerm_resource_group.mystoragerg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
-
-resource "azurerm_storage_container" "example" {
-  name                  = "taskboardsc${random_integer.ri.result}"
-  storage_account_id    = azurerm_storage_account.mystorageaccount.id
-  container_access_type = "private"
 }
