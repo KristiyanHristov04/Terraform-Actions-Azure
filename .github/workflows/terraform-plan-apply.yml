@@ -26,10 +26,10 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
-      - name: Init without backend
+      - name: Terraform Init (without backend)
         run: terraform init -backend=false
 
-      - name: Apply only backend resources
+      - name: Terraform Apply (only backend resources)
         run: |
           terraform apply -auto-approve \
             -target=azurerm_resource_group.mystoragerg \
@@ -37,71 +37,63 @@ jobs:
             -target=azurerm_storage_container.mystoragecontainer
 
   terraform-plan:
-    name: 'Terraform-Plan'
+    name: 'Terraform Plan'
     runs-on: ubuntu-latest
     environment: production
     needs: [storage-setup]
-
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
 
     steps:
-    # Checkout the repository to the GitHub Actions runner
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    # Login to Azure via Azure CLI
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    # Install the latest version of Terraform CLI
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-    - name: Terraform Init
-      run: terraform init
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
 
-    # Generates an execution plan for Terraform
-    - name: Terraform Plan
-      run: terraform plan -out=tfplan -input=false -var-file="values.tfvars"
+      - name: Terraform Init (with backend)
+        run: terraform init -reconfigure
 
-    # Save plan to artifacts
-    - name: Save plan to artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: tfplan
-        path: tfplan
-      
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan -input=false -var-file="values.tfvars"
+
+      - name: Upload tfplan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: tfplan
+
   terraform-apply:
-    name: 'Terraform-Apply'
+    name: 'Terraform Apply'
     runs-on: ubuntu-latest
     environment: production
     needs: [terraform-plan]
 
     steps:
-    # Checkout the repository to the GitHub Actions runner
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    # Install the latest version of Terraform CLI
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-    - name: Terraform Init
-      run: terraform init
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
 
-    # Download saved plan from artifacts
-    - name: Download plan
-      uses: actions/download-artifact@v4
-      with:
-        name: tfplan
-        
-    # Terraform Apply
-    - name: Terraform Apply
-      run: terraform apply -auto-approve tfplan
+      - name: Terraform Init (with backend)
+        run: terraform init -reconfigure
+
+      - name: Download tfplan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
