@@ -1,18 +1,18 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "4.38.1"
-    }
-  }
-}
+# terraform {
+#   required_providers {
+#     azurerm = {
+#       source  = "hashicorp/azurerm"
+#       version = "4.38.1"
+#     }
+#   }
+# }
 
-provider "azurerm" {
-  subscription_id = "db3c4452-c8ce-4bfd-b603-52f86c2380a8"
-  features {
+# provider "azurerm" {
+#   subscription_id = "db3c4452-c8ce-4bfd-b603-52f86c2380a8"
+#   features {
 
-  }
-}
+#   }
+# }
 
 resource "azurerm_resource_group" "mystoragerg" {
   name     = "MyStorageRG2"
