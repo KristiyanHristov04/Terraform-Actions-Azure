@@ -15,7 +15,6 @@ jobs:
     name: 'Terraform Plan'
     runs-on: ubuntu-latest
     environment: production
-    needs: [storage-setup]
     defaults:
       run:
         shell: bash
